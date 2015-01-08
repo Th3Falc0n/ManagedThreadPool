@@ -14,9 +14,9 @@ public class ManagedThreadPool {
     int maxLiveThreads = 0;
     int maxPersistentThreads = 256;
     
-    int timeTillNew = 200; //time block causes a new thread to join the active pool
-    int timeTillPers = 500; //time till block causes a single task to join the persistent pool
-    int timeTillClose = 1500; //idle time till a existing thread will close;
+    int timeTillNew = 50; //time block causes a new thread to join the active pool
+    int timeTillPers = 375; //time till block causes a single task to join the persistent pool
+    int timeTillClose = 1000; //idle time till a existing thread will close;
     
     int liveThreadNumber = 0;
     int persThreadNumber = 0;
@@ -119,7 +119,7 @@ public class ManagedThreadPool {
                                 t.setName("MTP Persistent Thread " + (persThreadNumber++));
                                 
                                 PoolThread ptr = createNewLiveThread();
-                                ptr.setName(ptr.getName() + "(rep)");
+                                ptr.setName(ptr.getName() + " (rep)");
                                 
                                 while(!t.scheduledWork.isEmpty()) {
                                     ptr.scheduledWork.add(t.scheduledWork.poll());
@@ -154,7 +154,7 @@ public class ManagedThreadPool {
                 
                 try {
                     synchronized (this) {
-                        wait(5);
+                        wait(1);
                     }
                 } catch (InterruptedException e) {
                     

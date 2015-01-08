@@ -37,11 +37,14 @@ public class PoolThread extends Thread {
         while(true) {
             if(!scheduledWork.isEmpty()) {
                 Runnable work = scheduledWork.poll();
-                if(!isWorking) stateTime = System.nanoTime();
-                isWorking = true;
-                taskTime = System.nanoTime();
                 
-                work.run();
+                if(work != null) {
+                    if(!isWorking) stateTime = System.nanoTime();
+                    isWorking = true;
+                    taskTime = System.nanoTime();
+                    
+                    work.run();
+                }
             }
             else
             {
