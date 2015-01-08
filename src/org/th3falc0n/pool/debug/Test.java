@@ -10,12 +10,16 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.th3falc0n.pool.ManagedThreadPool;
 
 public class Test {
-    volatile static int executed = 0;
-    volatile static int count = 10000;
+    volatile int executed = 0;
+    volatile int count = 100000;
     
     public static void main(String... args) {
+        new Test();
+    }
+    
+    public Test() {
         ManagedThreadPool mpool = new ManagedThreadPool(8);
-        ExecutorService tpool = Executors.newFixedThreadPool(8);
+        ExecutorService tpool = Executors.newWorkStealingPool(8);
         
         Random rnd = new Random();
         
@@ -29,31 +33,35 @@ public class Test {
         
         long tStart = System.nanoTime();
         
+        executed = 0;
+        
         for(int iouter = 0; iouter < count; iouter++) {
-            tpool.execute(new Runnable() {                
+            mpool.execute(new Runnable() {                
                 @SuppressWarnings("unused")
                 @Override
                 public void run() {
                     int cycles;
-                    float c = 16;
+                    float c = 4;
                     
-                    /*while(rnd.nextFloat() < 0.45) {
+                    while(rnd.nextFloat() < 0.35) {
                         c *= 1.6;
-                    }*/
+                    }
                     
                     cycles = (int)c;
                     
                     
                     for(int y = 0; y < 100; y++) {
                         for(int i = 0; i < cycles; i++) {
-                            int a = (i * y) % 128;
-                            int b = (i * y) % 127;
+                            int a = rnd.nextInt(25);
+                            int b = rnd.nextInt(125);
                             
                             int x = (a * b) % (i + a + b + 1);
                         }
                     }
                     
-                    executed++;
+                    synchronized (Test.this) {
+                        executed++;
+                    }
                     
                     //System.out.println("executed " + cycles + " cycles");
                 }
